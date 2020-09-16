@@ -2,26 +2,26 @@
 // Created by yaels on 15-Sep-20.
 //
 
-#include "account.h"
 #include <iostream>
+#include "../include/account.hpp"
 
-using namespace std;
+Account::Account()
+    :_balance(0){}
 
-account::account() {
-    balance = 0;
-};
+int Account::get_balance() const
+{
+    return _balance;
+}
 
-int account::checkBalance() const{
-    return balance;
-};
-
-void account::cashWithdrawal(int sum){
-    if (sum > balance)
-        cout << "Sorry, you cannot withdraw more money then you have in you account :(" << endl;
+void Account::withdraw_cash(int amount)
+{
+    if (amount > _balance)
+        std::cout << "Sorry, you cannot withdraw more money then you have in you account :(" << std::endl;
     else
-        balance -= sum;
-};
+        _balance -= amount;
+}
 
-void account::cashDeposit(int sum){
-    balance += sum;
-};
+void Account::deposit_cash(int amount)
+{
+    _balance += amount;
+}
