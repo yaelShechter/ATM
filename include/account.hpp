@@ -10,8 +10,7 @@ class Account
 public:
     Account();
     int get_balance() const;
-    void withdraw_cash(int amount);
-    void deposit_cash(int amount);
+    void modify_balance(int amount_of_money);
 
 private:
     int _balance;

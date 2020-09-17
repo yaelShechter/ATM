@@ -3,4 +3,6 @@ project(ATM)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(atm src/main.cpp src/account.cpp include/account.hpp)
+INCLUDE_DIRECTORIES(include)
+
+add_executable(atm src/main.cpp src/account.cpp)

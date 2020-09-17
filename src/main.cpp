@@ -2,74 +2,70 @@
 #include <string>
 #include "../include/account.hpp"
 
-static const std::string welcome_message = "To check balance please press 1\n"
-                             "To withdraw money out of your account please press 2\n"
-                             "To deposit money into your account please press 3\n"
-                             "To exit please press -1";
-void show_first_welcome_message()
-{
-    std::cout << "Hi there!\n" << welcome_message << std::endl;
+static const std::string MENU_OPTIONS = "To check balance please press 1\n"
+                                        "To withdraw cash from your account please press 2\n"
+                                        "To deposit cash into your account please press 3\n"
+                                        "To exit please press -1";
 
+void show_menu_options()
+{
+    std::cout << MENU_OPTIONS << std::endl;
 }
 
-void show_welcome_message()
+void show_balance(Account account)
 {
-    std::cout << welcome_message << std::endl;
-
+    std::cout << "Your balance is: " << account.get_balance() << std::endl;
 }
 
-void show_balance(Account acc, std::string new_or_old)
+int amount_to_modify()
 {
-    std::cout << new_or_old << ": " << acc.get_balance() << std::endl;
-
+    int amount_of_cash;
+    std::cout << "Please enter the amount you would like to modify: " << std::endl;
+    std::cin >> amount_of_cash;
+    return amount_of_cash;
 }
 
-int amount_to_withdraw_or_deposit(std::string withdraw_or_deposit)
+enum action_choice
 {
-    int amount;
-    std::cout << "Please enter the amount you would like to " << withdraw_or_deposit << ": "  << std::endl;
-    std::cin >> amount;
-    return amount;
-}
+    QUIT = -1,
+    GET_BALANCE = 1,
+    WITHDRAW = 2,
+    DEPOSIT = 3
+};
 
-enum action_choice {quit = -1, get_balance = 1, withdraw = 2, deposit = 3};
-
-int initialize_choice()
-{
+void choose_from_menu(Account account) {
     int choice;
-    show_first_welcome_message();
+    show_menu_options();
     std::cin >> choice;
-    return choice;
-}
-
-void choose_from_menu(int choice, Account acc) {
-    while (choice != quit) {
-        int amount;
-        switch (choice) {
-            case get_balance:
-                show_balance(acc, "Your balance is");
+    do
+    {
+        switch (choice)
+        {
+            case GET_BALANCE:
+                show_balance(account);
                 break;
-            case withdraw:
-                amount = amount_to_withdraw_or_deposit("withdraw");
-                acc.withdraw_cash(amount);
-                show_balance(acc, "New balance");
+            case WITHDRAW:
+            {
+                int amount_of_cash = amount_to_modify();
+                account.modify_balance(-amount_of_cash);
+                show_balance(account);
                 break;
-            case deposit:
-                amount = amount_to_withdraw_or_deposit("deposit");
-                acc.deposit_cash(amount);
-                show_balance(acc, "New balance");
+            }
+            case DEPOSIT:
+                int amount_of_cash = amount_to_modify();
+                account.modify_balance(amount_of_cash);
+                show_balance(account);
                 break;
         }
-        show_welcome_message();
+        show_menu_options();
         std::cin >> choice;
-    }
+    } while (QUIT != choice);
 }
 
-int main() {
-    int choice = initialize_choice();
-    Account acc;
-
-    choose_from_menu(choice, acc);
+int main()
+{
+    Account account;
+    choose_from_menu(account);
 
     return 0;
 }
