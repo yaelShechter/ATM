@@ -1,15 +1,13 @@
-//
-// Created by yaels on 17-Sep-20.
-//
 #pragma once
 
-#include <functional>
 #include <iostream>
+#include <functional>
 
 class MenuOption
 {
 public:
     MenuOption(std::string description, std::function<void()> handler);
+
     void handle() const;
     std::string description() const;
 

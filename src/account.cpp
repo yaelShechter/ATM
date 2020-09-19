@@ -1,14 +1,12 @@
-//
-// Created by yaels on 15-Sep-20.
-//
 #include <iostream>
+
 #include "account.hpp"
 
-Account::Account()
-        :_balance(0)
+Account::Account():
+    _balance(0)
 {}
 
-int Account::get_balance() const
+int Account::balance() const
 {
     return _balance;
 }
