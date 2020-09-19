@@ -3,6 +3,6 @@ project(ATM)
 
 set(CMAKE_CXX_STANDARD 17)
 
-INCLUDE_DIRECTORIES(include)
+add_executable(atm src/main.cpp src/account.cpp src/menu.cpp src/menu_option.cpp src/atm.cpp)
 
-add_executable(atm src/main.cpp src/account.cpp)
+target_include_directories(atm PRIVATE include)
