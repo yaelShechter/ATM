@@ -2,7 +2,6 @@
 
 #include "menu_option.hpp"
 
-
 MenuOption::MenuOption(std::string description, std::function<void()> handler):
     _description(description),
     _handler(handler)

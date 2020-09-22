@@ -20,6 +20,11 @@ void ATM::run()
     }
 }
 
+void ATM::_display_request_for_cash_amount()
+{
+    std::cout << "Please enter the desired amount: " << std::endl;
+}
+
 void ATM::_show_balance()
 {
     std::cout << "Your balance is: " << _account.balance() << std::endl;
@@ -27,27 +32,22 @@ void ATM::_show_balance()
 
 void ATM::_withdraw_cash()
 {
-    int cash_to_withdraw = _modify_cash();
+    int cash_to_withdraw = _input_cash();
     _account.modify_balance(-cash_to_withdraw);
     _show_balance();
 }
 
 void ATM::_deposit_cash()
 {
-    int cash_to_deposit = _modify_cash();
+    int cash_to_deposit = _input_cash();
     _account.modify_balance(cash_to_deposit);
     _show_balance();
 }
 
-void ATM::_print_cash_to_modify()
-{
-    std::cout << "Please enter the amount you would like to modify: " << std::endl;
-}
-
-int ATM::_modify_cash()
+int ATM::_input_cash()
 {
     int amount_of_cash;
-    _print_cash_to_modify();
+    _display_request_for_cash_amount();
     std::cin >> amount_of_cash;
     return amount_of_cash;
 }
