@@ -10,7 +10,10 @@ add_executable(atm
         src/menu.cpp
         src/main.cpp
         src/account.cpp
-        src/menu_option.cpp)
+        src/menu_option.cpp
+        src/user.cpp
+        include/database.hpp
+        src/text_file_database.cpp)
 
 target_include_directories(atm
         PRIVATE

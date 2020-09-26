@@ -1,7 +1,14 @@
 #pragma once
 
+#include <vector>
+
 #include "menu.hpp"
+#include "user.hpp"
 #include "account.hpp"
+#include "database.hpp"
+#include "login_error.hpp"
+#include "text_file_database.hpp"
+
 
 class ATM
 {
@@ -18,15 +25,23 @@ private:
     static void _display_request_for_cash_amount();
 
 private:
+    void _run_logged_user_screen();
+    void _login_user();
     void _show_balance();
     void _withdraw_cash();
     void _deposit_cash();
     int _input_cash();
-    void _exit_atm();
-    std::map<int, MenuOption> _initialize_menu_options();
+    void _logout_user();
+    std::map<int, MenuOption> _initialize_logged_menu_options();
+
+    int _get_id();
+    std::string _get_password();
+    Account& _get_account();
 
 private:
-    Account _account;
-    Menu _menu;
+    UserUPtr _logged_in_user;
+    Menu _logged_menu;
     bool _is_running;
+    bool _is_user_logged_in;
+    DatabaseUPtr _database;
 };

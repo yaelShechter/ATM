@@ -1,13 +1,15 @@
 #pragma once
 
+#include <memory>
+
 class Account
 {
 public:
-    Account();
+    Account(int balance);
     ~Account() = default;
 
-    Account(const Account& other) = delete;
-    Account& operator=(const Account& other) = delete;
+    Account(const Account& other) = default;
+    Account& operator=(const Account& other) = default;
 
     int balance() const;
     void modify_balance(int amount_of_money);
@@ -15,3 +17,5 @@ public:
 private:
     int _balance;
 };
+
+using AccountPtr = std::shared_ptr<Account>;

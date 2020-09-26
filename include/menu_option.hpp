@@ -10,8 +10,8 @@ public:
     MenuOption(std::string description, std::function<void()> handler);
     ~MenuOption() = default;
 
-    MenuOption(const MenuOption& other) = delete;
-    MenuOption& operator=(const MenuOption& other) = delete;
+    MenuOption(const MenuOption& other) = default;
+    MenuOption& operator=(const MenuOption& other) = default;
 
     void handle() const;
     std::string description() const;

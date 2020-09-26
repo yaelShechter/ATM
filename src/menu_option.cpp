@@ -3,8 +3,8 @@
 #include "menu_option.hpp"
 
 MenuOption::MenuOption(std::string description, std::function<void()> handler):
-    _description(description),
-    _handler(handler)
+    _description(std::move(description)),
+    _handler(std::move(handler))
 {}
 
 void MenuOption::handle() const
