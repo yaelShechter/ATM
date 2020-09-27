@@ -13,9 +13,9 @@ public:
     User(const User& other) = default;
     User& operator=(const User& other) = default;
 
-    void change_password(std::string password);
     int id() const;
     std::string password() const;
+    void set_password(std::string new_password);
     AccountPtr account();
 
 private:

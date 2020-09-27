@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.2)
 project(ATM)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -12,7 +12,6 @@ add_executable(atm
         src/account.cpp
         src/menu_option.cpp
         src/user.cpp
-        include/database.hpp
         src/text_file_database.cpp)
 
 target_include_directories(atm

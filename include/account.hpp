@@ -12,6 +12,7 @@ public:
     Account& operator=(const Account& other) = default;
 
     int balance() const;
+    void set_balance(int new_balance);
     void modify_balance(int amount_of_money);
 
 private:

@@ -2,13 +2,9 @@
 
 #include <vector>
 
-#include "menu.hpp"
 #include "user.hpp"
-#include "account.hpp"
-#include "database.hpp"
-#include "login_error.hpp"
+#include "menu.hpp"
 #include "text_file_database.hpp"
-
 
 class ATM
 {
@@ -32,11 +28,10 @@ private:
     void _deposit_cash();
     int _input_cash();
     void _logout_user();
-    std::map<int, MenuOption> _initialize_logged_menu_options();
-
     int _get_id();
     std::string _get_password();
-    Account& _get_account();
+    void _change_password();
+    std::map<int, MenuOption> _initialize_logged_menu_options();
 
 private:
     UserUPtr _logged_in_user;

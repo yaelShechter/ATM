@@ -1,7 +1,8 @@
 #include <iostream>
-#include <algorithm>
+#include <memory>
 
 #include "user.hpp"
+#include "login_error.hpp"
 #include "atm.hpp"
 
 ATM::ATM():
@@ -9,7 +10,7 @@ ATM::ATM():
         _logged_menu(_initialize_logged_menu_options()),
         _is_running(false),
         _is_user_logged_in(false),
-        _database(std::make_unique<TextFileDatabase>("users.txt"))
+        _database(std::make_unique<TextFileDatabase>("/home/yael/users.txt"))
 {}
 
 void ATM::run()
@@ -47,9 +48,20 @@ void ATM::_run_logged_user_screen()
 
 void ATM::_login_user()
 {
-    int id = _get_id();
-    std::string password = _get_password();
-    _logged_in_user = _database->get_user(id, password);
+    while(!_is_user_logged_in)
+    {
+        try
+        {
+            int id = _get_id();
+            std::string password = _get_password();
+            _logged_in_user = _database->get_user(id, password);
+            _is_user_logged_in = true;
+        }
+        catch (const LoginError& e)
+        {
+            std::cout << e.what() << std::endl;
+        }
+    }
 }
 
 void ATM::_show_balance()
@@ -61,6 +73,7 @@ void ATM::_withdraw_cash()
 {
     int cash_to_withdraw = _input_cash();
     _logged_in_user->account()->modify_balance(-cash_to_withdraw);
+    _database->update_user(_logged_in_user);
     _show_balance();
 }
 
@@ -68,6 +81,7 @@ void ATM::_deposit_cash()
 {
     int cash_to_deposit = _input_cash();
     _logged_in_user->account()->modify_balance(cash_to_deposit);
+    _database->update_user(_logged_in_user);
     _show_balance();
 }
 
@@ -81,6 +95,7 @@ int ATM::_input_cash()
         if(std::cin.fail())
         {
             std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             throw std::runtime_error("Exception: input must be an integer");
         }
     }
@@ -97,21 +112,31 @@ void ATM::_logout_user()
     _is_user_logged_in = false;
 }
 
-std::map<int, MenuOption> ATM::_initialize_logged_menu_options()
-{
-    return {
-        {1, MenuOption("Show balance", std::bind(&ATM::_show_balance, this))},
-        {2, MenuOption("Withdraw cash", std::bind(&ATM::_withdraw_cash, this))},
-        {3, MenuOption("Deposit cash", std::bind(&ATM::_deposit_cash, this))},
-        {4, MenuOption("Exit", std::bind(&ATM::_logout_user, this))}
-    };
-}
 
 int ATM::_get_id()
 {
     int id;
-    std::cout << "Please enter your id: " << std::endl;
-    std::cin >> id;
+    bool is_id_integer = false;
+    while(!is_id_integer)
+    {
+        try
+        {
+            std::cout << "Please enter your id: " << std::endl;
+            std::cin >> id;
+            if (!std::cin.fail())
+                is_id_integer = true;
+            else
+            {
+                std::cin.clear();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                throw LoginError("Id must be an integer");
+            }
+        }
+        catch (const LoginError& e)
+        {
+            std::cout << e.what() << std::endl;
+        }
+    }
     return id;
 }
 
@@ -121,4 +146,37 @@ std::string ATM::_get_password()
     std::cout << "Please enter your password: " << std::endl;
     std::cin >> password;
     return password;
+}
+
+void ATM::_change_password()
+{
+    bool password_changed = false;
+    while(!password_changed)
+    {
+        std::string new_password;
+        std::string repeat_password;
+        std::cout << "New password: " << std::endl;
+        std::cin >> new_password;
+        std::cout << "Repeat password: " << std::endl;
+        std::cin >> repeat_password;
+        if (new_password == repeat_password)
+        {
+            _logged_in_user->set_password(new_password);
+            password_changed = true;
+        }
+        else
+            std::cout << "Passwords don't match, Please try again." << std::endl;
+    }
+    _database->update_user(_logged_in_user);
+}
+
+std::map<int, MenuOption> ATM::_initialize_logged_menu_options()
+{
+    return {
+            {1, MenuOption("Show balance", std::bind(&ATM::_show_balance, this))},
+            {2, MenuOption("Withdraw cash", std::bind(&ATM::_withdraw_cash, this))},
+            {3, MenuOption("Deposit cash", std::bind(&ATM::_deposit_cash, this))},
+            {4, MenuOption("Change password", std::bind(&ATM::_change_password, this))},
+            {5, MenuOption("Exit", std::bind(&ATM::_logout_user, this))}
+    };
 }

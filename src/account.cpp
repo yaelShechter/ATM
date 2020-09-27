@@ -11,6 +11,11 @@ int Account::balance() const
     return _balance;
 }
 
+void Account::set_balance(int new_balance)
+{
+    _balance = new_balance;
+}
+
 void Account::modify_balance(int amount_of_money)
 {
     try

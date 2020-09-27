@@ -18,7 +18,7 @@ int main()
     catch (...)
     {
         std::cout << "Unknown exception." << std::endl;
-        return 2;//enum
+        return 2;
     }
     return 0;
 }

@@ -2,12 +2,14 @@
 
 #include <memory>
 
-#include "user.hpp"
-
 class Database
 {
 public:
-    Database();
+    Database() = default;
+    virtual ~Database() = default;
+
+    Database(const Database& other) = delete;
+    Database& operator=(const Database& other) = delete;
 
     virtual UserUPtr get_user(int id, std::string password) = 0;
     virtual void update_user(const UserUPtr& user) = 0;

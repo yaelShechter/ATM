@@ -18,6 +18,11 @@ std::string User::password() const
     return _password;
 }
 
+void User::set_password(std::string new_password)
+{
+    _password = new_password;
+}
+
 AccountPtr User::account()
 {
     return _account;
