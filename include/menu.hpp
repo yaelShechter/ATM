@@ -2,20 +2,22 @@
 
 #include <map>
 
-#include "account.hpp"
 #include "menu_option.hpp"
 
 class Menu
 {
 public:
-    Menu(std::map<int, MenuOption> menu_options);
-    ~Menu() = default;
+    explicit Menu(std::map<int, MenuOption> menu_options);
+    virtual ~Menu() = default;
 
-    Menu(const Menu& other) = delete;
+    Menu(const Menu& other) = default;
     Menu& operator=(const Menu& other) = delete;
 
+    std::map<int, MenuOption> map();
     void invoke_menu_option(int key);
-    void print_menu_options();
+
+private:
+    static const inline std::string KEY_SEPARATOR = ") ";
 
 private:
     std::map<int, MenuOption> _menu_options;

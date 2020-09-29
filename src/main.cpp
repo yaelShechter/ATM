@@ -1,6 +1,6 @@
 #include <iostream>
-#include <stdexcept>
 
+#include "error.hpp"
 #include "atm.hpp"
 
 int main()
@@ -13,12 +13,12 @@ int main()
     catch (const std::exception& e)
     {
         std::cout << e.what() << std::endl;
-        return 1;
+        return static_cast<int>(Error::runtime_error);
     }
     catch (...)
     {
         std::cout << "Unknown exception." << std::endl;
-        return 2;
+        return static_cast<int>(Error::unknown_error);
     }
     return 0;
 }

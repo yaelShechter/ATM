@@ -8,7 +8,7 @@ class MenuOption
 {
 public:
     MenuOption(std::string description, std::function<void()> handler);
-    ~MenuOption() = default;
+    virtual ~MenuOption() = default;
 
     MenuOption(const MenuOption& other) = default;
     MenuOption& operator=(const MenuOption& other) = default;

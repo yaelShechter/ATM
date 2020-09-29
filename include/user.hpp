@@ -2,13 +2,14 @@
 
 #include <memory>
 #include <iostream>
+#include <ostream>
 
 #include "account.hpp"
 
 class User {
 public:
     User(int id, std::string password, AccountPtr account);
-    ~User() = default;
+    virtual ~User() = default;
 
     User(const User& other) = default;
     User& operator=(const User& other) = default;
@@ -25,3 +26,9 @@ private:
 };
 
 using UserUPtr = std::unique_ptr<User>;
+
+inline std::ostream& operator<<(std::ostream& os, const UserUPtr& user)
+{
+    os << user->id() << " " << user->password() << " " << user->account()->balance();
+    return os;
+}

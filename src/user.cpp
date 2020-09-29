@@ -1,5 +1,3 @@
-
-#include "account.hpp"
 #include "user.hpp"
 
 User::User(int id, std::string password, AccountPtr account):
@@ -20,7 +18,7 @@ std::string User::password() const
 
 void User::set_password(std::string new_password)
 {
-    _password = new_password;
+    _password = std::move(new_password);
 }
 
 AccountPtr User::account()
