@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "output_device_cout.hpp"
 
 void OutputDeviceCout::request_for_cash_amount()
