@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "menu_option.hpp"
 
 MenuOption::MenuOption(std::string description, std::function<void()> handler):

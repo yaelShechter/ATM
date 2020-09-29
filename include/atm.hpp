@@ -1,6 +1,5 @@
 #pragma once
 
-#include <vector>
 #include <map>
 
 #include "menu.hpp"
@@ -22,10 +21,6 @@ public:
     void run();
 
 private:
-    static void _display_request_for_cash_amount();
-    static inline const std::string DATABASE_PATH = "/home/yael/users.txt";
-
-private:
     void _run_logged_user_screen();
     void _login_user();
     void _show_balance();
@@ -33,7 +28,10 @@ private:
     void _deposit_cash();
     void _logout_user();
     void _change_password();
-    std::map<int, MenuOption> _initialize_logged_menu_options();
+    std::map<int, MenuOptionPtr> _initialize_logged_menu_options();
+
+private:
+    static inline const std::string DATABASE_PATH = "/home/yael/users.txt";
 
 private:
     UserUPtr _logged_in_user;

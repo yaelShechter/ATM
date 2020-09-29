@@ -1,7 +1,6 @@
 #pragma once
 
 #include <memory>
-#include <iostream>
 #include <ostream>
 
 #include "account.hpp"
@@ -27,8 +26,8 @@ private:
 
 using UserUPtr = std::unique_ptr<User>;
 
-inline std::ostream& operator<<(std::ostream& os, const UserUPtr& user)
+inline std::ostream& operator<<(std::ostream& user_string, const UserUPtr& user)
 {
-    os << user->id() << " " << user->password() << " " << user->account()->balance();
-    return os;
+    user_string << user->id() << " " << user->password() << " " << user->account()->balance();
+    return user_string;
 }

@@ -13,7 +13,6 @@ public:
     OutputDevice& operator=(const OutputDevice& other) = delete;
 
     virtual void request_for_cash_amount() = 0;
-    virtual void request_for_number() = 0;
     virtual void display_balance(int) = 0;
     virtual void request_for_id() = 0;
     virtual void request_for_password() = 0;

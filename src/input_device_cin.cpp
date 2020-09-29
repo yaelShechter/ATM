@@ -40,7 +40,6 @@ std::string InputDeviceCin::input_password()
     return password;
 }
 
-
 int InputDeviceCin::input_number_with_range(int min_value, int max_value)
 {
     int input_number = get_number();
@@ -48,5 +47,3 @@ int InputDeviceCin::input_number_with_range(int min_value, int max_value)
         throw std::runtime_error("Number is out of range.");
     return input_number;
 }
-
-

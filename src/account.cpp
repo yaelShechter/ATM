@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "account.hpp"
 
 Account::Account(int balance):
@@ -15,4 +13,3 @@ void Account::set_balance(int new_balance)
 {
     _balance = new_balance;
 }
-

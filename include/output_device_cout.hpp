@@ -13,7 +13,6 @@ public:
     OutputDeviceCout& operator=(const OutputDeviceCout& other) = delete;
 
     void request_for_cash_amount() override;
-    void request_for_number() override;
     void display_balance(int) override;
     void request_for_id() override;
     void request_for_password() override;

@@ -1,7 +1,5 @@
 #include <iostream>
 
-#include "user.hpp"
-#include "menu.hpp"
 #include "login_error.hpp"
 #include "input_device_cin.hpp"
 #include "output_device_cout.hpp"
@@ -107,13 +105,10 @@ void ATM::_logout_user()
 
 void ATM::_change_password()
 {
-    std::string new_password;
-    std::string repeated_password;
-
     _output_device->request_for_password();
-    new_password = _input_device->input_password();
+    std::string new_password = _input_device->input_password();
     _output_device->request_for_repeated_password();
-    repeated_password = _input_device->input_password();
+    std::string repeated_password = _input_device->input_password();
     if (new_password == repeated_password)
     {
         _logged_in_user->set_password(new_password);
@@ -123,13 +118,13 @@ void ATM::_change_password()
         _output_device->unmatched_passwords();
 }
 
-std::map<int, MenuOption> ATM::_initialize_logged_menu_options()
+std::map<int, MenuOptionPtr> ATM::_initialize_logged_menu_options()
 {
-    return {
-            {1, MenuOption("Show balance", [this] { _show_balance(); })},
-            {2, MenuOption("Withdraw cash", [this] { _withdraw_cash(); })},
-            {3, MenuOption("Deposit cash", [this] { _deposit_cash(); })},
-            {4, MenuOption("Change password", [this] { _change_password(); })},
-            {5, MenuOption("Exit", [this] { _logout_user(); })}
-    };
+    std::map<int, MenuOptionPtr> map = {};
+    map[1] = std::make_shared<MenuOption>("Show balance", [this] { _show_balance(); });
+    map[2] = std::make_shared<MenuOption>("Withdraw cash", [this] { _withdraw_cash(); });
+    map[3] = std::make_shared<MenuOption>("Deposit cash", [this] { _deposit_cash(); });
+    map[4] = std::make_shared<MenuOption>("Change password", [this] { _change_password(); });
+    map[5] = std::make_shared<MenuOption>("Exit", [this] { _logout_user(); });
+    return map;
 }
