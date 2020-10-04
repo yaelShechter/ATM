@@ -1,7 +1,7 @@
 #pragma once
 
-enum class Error
+enum class ERROR
 {
-    runtime_error = 1,
-    unknown_error = 2
+    RUNTIME_ERROR = 1,
+    UNKNOWN_ERROR = 2
 };

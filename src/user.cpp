@@ -3,7 +3,7 @@
 User::User(int id, std::string password, AccountPtr account):
     _id(id),
     _password(std::move(password)),
-    _account(account)
+    _account(std::move(account))
 {}
 
 int User::id() const

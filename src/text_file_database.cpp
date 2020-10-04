@@ -4,7 +4,7 @@
 #include <sstream>
 #include <algorithm>
 
-#include "login_error.hpp"
+#include "db_error.hpp"
 #include "text_file_database.hpp"
 
 TextFileDatabase::TextFileDatabase(std::string file_path):
@@ -13,46 +13,53 @@ TextFileDatabase::TextFileDatabase(std::string file_path):
 
 UserUPtr TextFileDatabase::get_user(int id, std::string password)
 {
-    std::vector<UserUPtr> users = _copy_users_into_vector();
-    std::vector<UserUPtr>::iterator user_iterator;
-    user_iterator = std::find_if(users.begin(), users.end(), [id, password] (const UserUPtr& user)
-        {
-            return user->id() == id and user->password() == password;
-        });
+    std::vector<UserUPtr> users = _get_user_list_from_file();
+    auto user_iterator = std::find_if(
+            users.begin(),
+            users.end(),
+            [id, password] (const UserUPtr& user)
+            {
+                return user->id() == id and user->password() == password;
+            });
+
     if(user_iterator == users.end())
     {
-        throw LoginError("User was not found.");
+        throw DBError("TextFileDatabase:get_user: User was not found.");
     }
-    return std::make_unique<User>(id, password, std::make_unique<Account>((*user_iterator)->account()->balance()));
+    return std::move(*user_iterator);
 }
 
 void TextFileDatabase::update_user(const UserUPtr& user)
 {
-    std::vector<UserUPtr> users = _copy_users_into_vector();;
+    std::vector<UserUPtr> users = _get_user_list_from_file();
     _update_user_in_vector(users, user);
-    std::ofstream clear_file(_file_path);
-    clear_file.close();
     _copy_users_vector_to_file(users);
 }
 
-std::vector<UserUPtr> TextFileDatabase::_copy_users_into_vector()
+UserUPtr TextFileDatabase::_parse_line_to_user(std::string line)
+{
+    std::istringstream line_string(line);
+
+    int user_id;
+    int user_balance;
+    std::string user_password;
+
+    if(!(line_string >> user_id >> user_password >> user_balance))
+    {
+        throw DBError("TextFileDatabase:_parse_line_to_user: Database needs fixing."); //DBerror;
+    }
+    return std::make_unique<User>(user_id, user_password, std::make_shared<Account>(user_balance));
+}
+
+std::vector<UserUPtr> TextFileDatabase::_get_user_list_from_file()
 {
     std::string line;
     std::ifstream users_list_text_file(_file_path);
     std::vector<UserUPtr> users;
     while(std::getline(users_list_text_file, line))
     {
-        int user_id;
-        int user_balance;
-        std::string user_password;
-        std::istringstream iss(line);
-        if(!(iss >> user_id >> user_password >> user_balance))
-        {
-            throw std::runtime_error("Database needs fixing.");
-        }
-        users.push_back(std::make_unique<User>(user_id, user_password, std::make_shared<Account>(user_balance)));
+        users.push_back(_parse_line_to_user(line));
     }
-    users_list_text_file.close();
     return users;
 }
 
@@ -70,10 +77,9 @@ void TextFileDatabase::_update_user_in_vector(const std::vector<UserUPtr>& users
 
 void TextFileDatabase::_copy_users_vector_to_file(const std::vector<UserUPtr>& users)
 {
-    std::ofstream new_users_list_text_file(_file_path);
+    std::ofstream new_users_list_text_file(_file_path, std::fstream::trunc);
     for (const auto &user : users)
     {
         new_users_list_text_file << user << std::endl;
     }
-    new_users_list_text_file.close();
 }

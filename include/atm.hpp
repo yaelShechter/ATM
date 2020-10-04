@@ -11,6 +11,9 @@
 
 class ATM
 {
+private:
+    static inline const std::string DATABASE_PATH = "/home/yael/users.txt";
+
 public:
     ATM();
     virtual ~ATM() = default;
@@ -22,16 +25,13 @@ public:
 
 private:
     void _run_logged_user_screen();
-    void _login_user();
     void _show_balance();
     void _withdraw_cash();
     void _deposit_cash();
     void _logout_user();
     void _change_password();
-    std::map<int, MenuOptionPtr> _initialize_logged_menu_options();
-
-private:
-    static inline const std::string DATABASE_PATH = "/home/yael/users.txt";
+    UserUPtr _login_user();
+    std::map<int, MenuOption> _initialize_logged_menu_options();
 
 private:
     UserUPtr _logged_in_user;

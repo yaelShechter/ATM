@@ -9,7 +9,7 @@ public:
     ~Account() = default;
 
     Account(const Account& other) = delete;
-    Account& operator=(const Account& other) = default;
+    Account& operator=(const Account& other) = delete;
 
     int balance() const;
     void set_balance(int new_balance);

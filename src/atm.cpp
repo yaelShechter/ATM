@@ -1,9 +1,12 @@
 #include <iostream>
 
+#include "db_error.hpp"
 #include "login_error.hpp"
-#include "input_device_cin.hpp"
-#include "output_device_cout.hpp"
+#include "id_input_error.hpp"
+#include "cin_input_device.hpp"
+#include "cout_output_device.hpp"
 #include "text_file_database.hpp"
+#include "password_input_error.hpp"
 #include "atm.hpp"
 
 ATM::ATM():
@@ -11,8 +14,8 @@ ATM::ATM():
     _logged_menu(_initialize_logged_menu_options()),
     _is_running(false),
     _database(std::make_unique<TextFileDatabase>(DATABASE_PATH)),
-    _input_device(std::make_unique<InputDeviceCin>()),
-    _output_device(std::make_unique<OutputDeviceCout>())
+    _input_device(std::make_unique<CinInputDevice>()),
+    _output_device(std::make_unique<CoutOutputDevice>())
 {}
 
 void ATM::run()
@@ -22,80 +25,114 @@ void ATM::run()
     {
         try
         {
-            _login_user();
+            _logged_in_user = _login_user();
             _run_logged_user_screen();
         }
         catch (const LoginError& e)
-        {
-            std::cout << e.what() << std::endl;
-        }
+        {}
     }
 }
 
 void ATM::_run_logged_user_screen()
 {
-    int choice;
     while(nullptr != _logged_in_user)
     {
         try
         {
             _output_device->print_menu(_logged_menu);
-            choice = _input_device->input_number_with_range(1, 5);
+            int choice = _input_device->input_number();
             _logged_menu.invoke_menu_option(choice);
         }
-        catch (const std::runtime_error& e)
+        catch (const InputError& e)
         {
-            std::cout << e.what() << std::endl;
+            _output_device->prompt_message("Input must be a number");
+        }
+        catch (const std::out_of_range& e)
+        {
+            _output_device->prompt_message("Invalid menu option");
         }
     }
 }
 
-void ATM::_login_user()
+UserUPtr ATM::_login_user()
 {
-    while(nullptr == _logged_in_user)
+    UserUPtr user;
+    try
     {
-        try
-        {
-            _output_device->request_for_id();
-            int id = _input_device->input_id();
-            _output_device->request_for_password();
-            std::string password = _input_device->input_password();
-            _logged_in_user = _database->get_user(id, password);
-        }
-        catch (const LoginError& e)
-        {
-            std::cout << e.what() << std::endl;
-        }
+        _output_device->prompt_message("Please enter id: ");
+        int id = _input_device->input_id();
+        _output_device->prompt_message("Please Enter Password: ");
+        std::string password = _input_device->input_password();
+        user = _database->get_user(id, password);
     }
+    catch(const IdInputError& e)
+    {
+        _output_device->prompt_message("Id must be an integer.");
+        throw LoginError("ATM:login_user: Bad id input.");
+    }
+    catch(const PasswordInputError& e)
+    {
+        _output_device->prompt_message("Bad password input");
+        throw LoginError("ATM:login_user: Bad password input.");
+    }
+    catch(const DBError& e)
+    {
+        _output_device->prompt_message("Wrong credentials");
+        throw LoginError("ATM:login_user: Bad password input.");
+    }
+    return user;
 }
 
 void ATM::_show_balance()
 {
-    _output_device->display_balance(_logged_in_user->account()->balance());
+    _output_device->prompt_message("Your balance is: " + std::to_string(_logged_in_user->account()->balance()));
 }
 
 void ATM::_withdraw_cash()
 {
-    int current_balance = _logged_in_user->account()->balance();
-    _output_device->request_for_cash_amount();
-    int cash_to_withdraw = _input_device->get_number();
-    if(current_balance < cash_to_withdraw)
-    {
-        throw std::runtime_error("Exception: balance can't be negative.");
+    try {
+        _output_device->prompt_message("Please enter the desired amount: ");
+        int current_balance = _logged_in_user->account()->balance();
+        int cash_to_withdraw = _input_device->input_number_with_range(0, std::numeric_limits<int>::max()); //may throw
+        if (current_balance < cash_to_withdraw) {
+            _output_device->prompt_message("balance can't be negative.");
+        } else {
+            _logged_in_user->account()->set_balance(current_balance - cash_to_withdraw);
+            _database->update_user(_logged_in_user);
+            _show_balance();
+        }
     }
-    _logged_in_user->account()->set_balance(current_balance - cash_to_withdraw);
-    _database->update_user(_logged_in_user);
-    _show_balance();
+    catch (const InputError &e) {
+        _output_device->prompt_message("Please enter a positive number");
+        throw InputError("ATM:_deposit_cash: input was invalid");
+    }
+    catch (const DBError &e) {
+        _output_device->prompt_message("Database could not be updated");
+        throw DBError("ATM:_deposit_cash: something went wrong with the database");
+    }
 }
 
 void ATM::_deposit_cash()
 {
-    int current_balance = _logged_in_user->account()->balance();
-    _output_device->request_for_cash_amount();
-    int cash_to_deposit = _input_device->get_number();
-    _logged_in_user->account()->set_balance(current_balance + cash_to_deposit);
-    _database->update_user(_logged_in_user);
-    _show_balance();
+    try
+    {
+        int current_balance = _logged_in_user->account()->balance();
+        _output_device->prompt_message("Please enter the desired amount: ");
+        int cash_to_deposit = _input_device->input_number_with_range(0, std::numeric_limits<int>::max()); //may throw
+        _logged_in_user->account()->set_balance(current_balance + cash_to_deposit);
+        _database->update_user(_logged_in_user);
+        _show_balance();
+    }
+    catch (const InputError& e)
+    {
+        _output_device->prompt_message("Please enter a positive number");
+        throw InputError("ATM:_deposit_cash: input was invalid");
+    }
+    catch(const DBError& e)
+    {
+        _output_device->prompt_message("Database could not be updated");
+        throw DBError("ATM:_deposit_cash: something went wrong with the database");
+    }
 }
 
 void ATM::_logout_user()
@@ -105,26 +142,30 @@ void ATM::_logout_user()
 
 void ATM::_change_password()
 {
-    _output_device->request_for_password();
-    std::string new_password = _input_device->input_password();
-    _output_device->request_for_repeated_password();
-    std::string repeated_password = _input_device->input_password();
+    _output_device->prompt_message("Please enter password: ");
+    std::string new_password = _input_device->input_password();// may throw
+
+    _output_device->prompt_message("Please repeat password: ");
+    std::string repeated_password = _input_device->input_password(); //may throw
+
     if (new_password == repeated_password)
     {
         _logged_in_user->set_password(new_password);
         _database->update_user(_logged_in_user);
     }
     else
-        _output_device->unmatched_passwords();
+    {
+        _output_device->prompt_message("Passwords don't match");
+    }
 }
 
-std::map<int, MenuOptionPtr> ATM::_initialize_logged_menu_options()
+std::map<int, MenuOption> ATM::_initialize_logged_menu_options()
 {
-    std::map<int, MenuOptionPtr> map = {};
-    map[1] = std::make_shared<MenuOption>("Show balance", [this] { _show_balance(); });
-    map[2] = std::make_shared<MenuOption>("Withdraw cash", [this] { _withdraw_cash(); });
-    map[3] = std::make_shared<MenuOption>("Deposit cash", [this] { _deposit_cash(); });
-    map[4] = std::make_shared<MenuOption>("Change password", [this] { _change_password(); });
-    map[5] = std::make_shared<MenuOption>("Exit", [this] { _logout_user(); });
-    return map;
+    return {
+            {1, MenuOption("Show balance", [this] { _show_balance(); })},
+            {2, MenuOption("Withdraw cash", [this] { _withdraw_cash(); })},
+            {3, MenuOption("Deposit cash", [this] { _deposit_cash(); })},
+            {4, MenuOption("Change password", [this] { _change_password(); })},
+            {5, MenuOption("Exit", [this] { _logout_user(); })}
+    };
 }

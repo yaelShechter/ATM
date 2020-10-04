@@ -13,7 +13,8 @@ add_executable(atm
         src/menu_option.cpp
         src/user.cpp
         src/text_file_database.cpp
-        src/input_device_cin.cpp include/output_device.hpp src/output_device_cout.cpp include/output_device_cout.hpp)
+        src/cin_input_device.cpp
+        src/cout_output_device.cpp include/input_error.hpp include/id_input_error.hpp include/password_input_error.hpp include/db_error.hpp)
 
 target_include_directories(atm
         PRIVATE

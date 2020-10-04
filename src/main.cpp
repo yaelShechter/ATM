@@ -13,12 +13,12 @@ int main()
     catch (const std::exception& e)
     {
         std::cout << e.what() << std::endl;
-        return static_cast<int>(Error::runtime_error);
+        return static_cast<int>(ERROR::RUNTIME_ERROR);
     }
     catch (...)
     {
         std::cout << "Unknown exception." << std::endl;
-        return static_cast<int>(Error::unknown_error);
+        return static_cast<int>(ERROR::UNKNOWN_ERROR);
     }
     return 0;
 }
